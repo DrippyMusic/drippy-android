@@ -3,13 +3,11 @@ package me.vitormac.drippy;
 import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.webkit.JavascriptInterface;
 
-import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 
 import org.json.JSONException;
@@ -21,12 +19,10 @@ import java.net.URL;
 
 public class JavascriptBridge {
 
-    private final Activity activity;
     private final NotificationManager manager;
     private final NotificationCompat.Builder builder;
 
     JavascriptBridge(Activity activity) {
-        this.activity = activity;
         this.manager = activity.getSystemService(NotificationManager.class);
         this.builder = new NotificationCompat.Builder(activity, "drippy").setOngoing(true)
                 .setSmallIcon(android.R.drawable.ic_media_play)
