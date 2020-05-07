@@ -12,13 +12,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        this.webView = new WebView(this);
+        this.getSupportActionBar().setDisplayShowTitleEnabled(false);
+        this.setContentView(R.layout.activity_main);
+        this.webView = this.findViewById(R.id.webview);
         this.webView.getSettings().setJavaScriptEnabled(true);
         this.webView.addJavascriptInterface(new JavascriptBridge(this), "native");
         this.webView.getSettings().setDomStorageEnabled(true);
-        this.webView.loadUrl("https://drippy-music.github.io/");
-        this.setContentView(this.webView);
+        this.webView.loadUrl("https://drippy.live");
     }
 
     @Override
