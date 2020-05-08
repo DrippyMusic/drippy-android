@@ -26,15 +26,53 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <ImageView
+                android:id="@+id/artwork"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="292dp"
+                android:layout_marginBottom="4dp"
+                android:elevation="5dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/play_button"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="2dp"
+                android:textColor="#FFFFFF"
+                app:layout_constraintBottom_toTopOf="@+id/artists"
+                app:layout_constraintStart_toEndOf="@+id/artwork"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/artists"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="16dp"
+                android:foregroundTint="#323232"
+                android:textColor="#9e9e9e"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/artwork"
+                app:layout_constraintTop_toBottomOf="@+id/title" />
+
             <ImageButton
-                android:id="@+id/imageButton"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:id="@+id/play_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_marginStart="380dp"
                 android:layout_marginTop="24dp"
-                android:layout_marginEnd="48dp"
+                android:layout_marginEnd="32dp"
                 android:layout_marginBottom="24dp"
-                android:adjustViewBounds="true"
                 android:background="@android:color/transparent"
                 android:scaleType="fitCenter"
                 app:layout_constraintBottom_toBottomOf="parent"
