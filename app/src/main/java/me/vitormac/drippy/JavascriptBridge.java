@@ -6,9 +6,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.AudioAttributes;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -19,6 +16,13 @@ import android.widget.TextView;
 
 import androidx.core.app.NotificationCompat;
 
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.ProgressiveMediaSource;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
 import com.google.common.base.Joiner;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -38,7 +42,7 @@ public class JavascriptBridge {
     private final Activity activity;
     private final NotificationManager manager;
     private final NotificationCompat.Builder builder;
-    private final MediaPlayer player = new MediaPlayer();
+    private final SimpleExoPlayer player;
 
     JavascriptBridge(Activity activity) {
         this.activity = activity;
@@ -53,22 +57,19 @@ public class JavascriptBridge {
         }
 
         ImageButton button = this.activity.findViewById(R.id.play_button);
-        AudioAttributes attributes = new AudioAttributes.Builder().setLegacyStreamType(AudioManager.STREAM_MUSIC)
-                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build();
-        this.player.setAudioAttributes(attributes);
-        this.player.setOnPreparedListener(player -> {
-            button.setImageDrawable(this.activity.getDrawable(R.drawable.ic_pause));
-            player.start();
+        this.player = new SimpleExoPlayer.Builder(activity).build();
+        this.player.setPlayWhenReady(true);
+        this.player.addListener(new Player.EventListener() {
+            @Override
+            public void onIsPlayingChanged(boolean isPlaying) {
+                activity.runOnUiThread(() -> {
+                    button.setImageDrawable(activity.getDrawable(isPlaying ? R.drawable.ic_pause : R.drawable.ic_play_arrow));
+                });
+            }
         });
 
         this.activity.findViewById(R.id.play_button).setOnClickListener(view -> {
-            if (this.player.isPlaying()) {
-                button.setImageDrawable(this.activity.getDrawable(R.drawable.ic_play_arrow));
-                this.player.pause();
-            } else {
-                button.setImageDrawable(this.activity.getDrawable(R.drawable.ic_pause));
-                this.player.start();
-            }
+            this.player.setPlayWhenReady(!this.player.isPlaying());
         });
     }
 
@@ -84,15 +85,19 @@ public class JavascriptBridge {
             artists.add(artist.get("name").getAsString());
         }
 
+        DataSource.Factory factory = new DefaultDataSourceFactory(this.activity,
+                Util.getUserAgent(this.activity, "drippy"));
+        MediaSource source = new ProgressiveMediaSource.Factory(factory).createMediaSource(
+                Uri.parse(Joiner.on('/').join(Arrays.asList(API_URL, "stream", idToken, object.get("id").getAsString())))
+        );
+
         this.activity.runOnUiThread(() -> {
             ((TextView) this.activity.findViewById(R.id.title)).setText(object.get("name").getAsString());
             ((TextView) this.activity.findViewById(R.id.artists)).setText(Joiner.on(',').join(artists));
             new LoaderTask(this.activity.findViewById(R.id.artwork)).execute(artwork);
+            this.player.stop(true);
+            this.player.prepare(source);
         });
-
-        if (this.player.isPlaying()) this.player.reset();
-        this.player.setDataSource(this.activity, Uri.parse(Joiner.on('/').join(Arrays.asList(API_URL, "stream", idToken, object.get("id").getAsString()))));
-        this.player.prepareAsync();
     }
 
     private static class LoaderTask extends AsyncTask<String, Void, Bitmap> {
