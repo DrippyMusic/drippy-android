@@ -19,7 +19,9 @@
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:layout_gravity="bottom"
-        app:backgroundTint="@color/colorPrimaryDark"
+        android:clickable="true"
+        android:onClick="openPlayer"
+        app:backgroundTint="@color/colorPrimary"
         app:contentInsetStart="0dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -74,6 +76,7 @@
                 android:layout_marginEnd="32dp"
                 android:layout_marginBottom="24dp"
                 android:background="@android:color/transparent"
+                android:onClick="toggle"
                 android:scaleType="fitCenter"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
