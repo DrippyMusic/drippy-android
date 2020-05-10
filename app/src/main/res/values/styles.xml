@@ -1,13 +1,11 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="windowActionBarOverlay">true</item>
-        <item name="displayOptions">showHome</item>
     </style>
 
     <style name="SlideAnimation">
@@ -15,10 +13,7 @@
         <item name="android:windowExitAnimation">@anim/slide_down_dialog</item>
     </style>
 
-    <style name="VuetifyDialog" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+    <style name="VuetifyDialog" parent="@style/AppTheme">
         <item name="android:windowAnimationStyle">@style/SlideAnimation</item>
     </style>
 
