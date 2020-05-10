@@ -64,15 +64,18 @@ public class NowPlaying extends AppCompatActivity implements Runnable, Player.Ev
 
     @Override
     public void run() {
-        ((SeekBar) this.findViewById(R.id.player_progress))
-                .setProgress((int) (this.player.getCurrentPosition() / 1000L));
+        int position = (int) (this.player.getCurrentPosition() / 1000L);
+        ((SeekBar) this.findViewById(R.id.player_progress)).setProgress(position);
+        ((TextView) this.findViewById(R.id.player_position)).setText(Utils.format(position));
         this.handler.postDelayed(this, 1000);
     }
 
     private void update(Track track) {
         ((SeekBar) this.findViewById(R.id.player_progress)).setMax(track.getDuration());
         ((TextView) this.findViewById(R.id.player_title)).setText(track.getTitle());
+        ((TextView) this.findViewById(R.id.player_artist)).setText(track.getArtists());
         ((TextView) this.findViewById(R.id.player_album)).setText(track.getAlbum());
+        ((TextView) this.findViewById(R.id.player_duration)).setText(Utils.format(track.getDuration()));
         new LoaderTask(this.findViewById(R.id.player_artwork)).execute(track.getArtwork(0));
     }
 
