@@ -28,8 +28,8 @@ public final class MediaManager {
         return MediaManager.INSTANCE;
     }
 
-    public static void create(Context context) {
-        MediaManager.INSTANCE = new MediaManager(context.getApplicationContext());
+    public static MediaManager create(Context context) {
+        return MediaManager.INSTANCE = new MediaManager(context.getApplicationContext());
     }
 
     private final SimpleExoPlayer player;

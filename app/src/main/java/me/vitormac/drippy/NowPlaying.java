@@ -1,6 +1,5 @@
 package me.vitormac.drippy;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -11,7 +10,6 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.SimpleExoPlayer;
 
 import me.vitormac.drippy.model.LoaderTask;
 import me.vitormac.drippy.model.MediaManager;
@@ -31,8 +29,8 @@ public class NowPlaying extends AppCompatActivity implements Runnable, Player.Ev
         this.player = MediaManager.getInstance().getPlayer();
 
         this.player.addListener(this);
-        this.playButton.setImageDrawable(this.getButtonIcon(this.player.isPlaying()));
-        if (this.player.isPlaying()) {
+        this.playButton.setImageDrawable(Utils.getButtonIcon(this, this.player.isPlaying()));
+        if (this.player.getCurrentTag() != null) {
             this.update((Track) this.player.getCurrentTag());
             this.handler.post(this);
         }
@@ -47,12 +45,19 @@ public class NowPlaying extends AppCompatActivity implements Runnable, Player.Ev
 
     @Override
     public void onIsPlayingChanged(boolean isPlaying) {
-        this.playButton.setImageDrawable(this.getButtonIcon(isPlaying));
+        this.playButton.setImageDrawable(Utils.getButtonIcon(this, isPlaying));
+    }
+
+    @Override
+    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+        if (playbackState == Player.STATE_READY && playWhenReady) {
+            this.update((Track) this.player.getCurrentTag());
+        }
     }
 
     @Override
     public void onPositionDiscontinuity(int reason) {
-        if (reason < Player.DISCONTINUITY_REASON_SEEK_ADJUSTMENT) {
+        if (this.player.getPlaybackState() == Player.STATE_READY && reason < Player.DISCONTINUITY_REASON_SEEK_ADJUSTMENT) {
             this.update((Track) this.player.getCurrentTag());
         }
     }
@@ -69,13 +74,6 @@ public class NowPlaying extends AppCompatActivity implements Runnable, Player.Ev
         ((TextView) this.findViewById(R.id.player_title)).setText(track.getTitle());
         ((TextView) this.findViewById(R.id.player_album)).setText(track.getAlbum());
         new LoaderTask(this.findViewById(R.id.player_artwork)).execute(track.getArtwork(0));
-    }
-
-    private Drawable getButtonIcon(boolean playing) {
-        if (playing) {
-            return this.getDrawable(R.drawable.ic_pause);
-        }
-        return this.getDrawable(R.drawable.ic_play_arrow);
     }
 
     public void previous(View view) {
