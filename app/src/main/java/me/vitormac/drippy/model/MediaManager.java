@@ -3,9 +3,11 @@ package me.vitormac.drippy.model;
 import android.content.Context;
 import android.net.Uri;
 
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.upstream.DataSource;
@@ -14,10 +16,12 @@ import com.google.android.exoplayer2.util.Util;
 import com.google.common.base.Joiner;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 public final class MediaManager {
 
-    private static final String API_URL = "https://api.drippy.live";
+
     private static MediaManager INSTANCE;
 
     public static MediaManager getInstance() {
@@ -28,26 +32,26 @@ public final class MediaManager {
         MediaManager.INSTANCE = new MediaManager(context.getApplicationContext());
     }
 
-    private Track current;
     private final SimpleExoPlayer player;
 
     private MediaManager(Context context) {
         this.player = new SimpleExoPlayer.Builder(context).build();
-        this.player.setPlayWhenReady(true);
     }
 
-    public void play(Context context, String idToken, Track track) {
-        this.current = track;
+    public void play(Context context, String idToken, List<Track> tracks, int index) {
+        ConcatenatingMediaSource sources = new ConcatenatingMediaSource();
         DataSource.Factory factory = new DefaultDataSourceFactory(context,
                 Util.getUserAgent(context, "drippy"));
-        DefaultExtractorsFactory extractor = new DefaultExtractorsFactory()
-                .setConstantBitrateSeekingEnabled(true);
-        MediaSource source = new ProgressiveMediaSource.Factory(factory, extractor).createMediaSource(
-                Uri.parse(Joiner.on('/').join(Arrays.asList(API_URL, "stream", idToken, this.current.getId())))
-        );
+        for (Track track : tracks) {
+            MediaSource source = new ProgressiveMediaSource.Factory(factory)
+                    .setTag(track).createMediaSource(Uri.parse(track.getStreamURL(idToken)));
+            sources.addMediaSource(source);
+        }
 
         this.player.stop(true);
-        this.player.prepare(source);
+        this.player.prepare(sources);
+        this.player.setPlayWhenReady(true);
+        this.player.seekToDefaultPosition(index);
     }
 
     public boolean toggle() {
@@ -59,7 +63,4 @@ public final class MediaManager {
         return player;
     }
 
-    public Track getCurrent() {
-        return current;
-    }
 }

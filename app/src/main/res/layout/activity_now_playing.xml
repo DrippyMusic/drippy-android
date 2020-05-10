@@ -101,6 +101,7 @@
                 android:layout_height="24dp"
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
+                android:onClick="previous"
                 android:scaleType="fitCenter"
                 app:srcCompat="@drawable/ic_skip_previous" />
 
@@ -120,6 +121,7 @@
                 android:layout_height="24dp"
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
+                android:onClick="next"
                 android:scaleType="fitCenter"
                 app:srcCompat="@drawable/ic_skip_next" />
 

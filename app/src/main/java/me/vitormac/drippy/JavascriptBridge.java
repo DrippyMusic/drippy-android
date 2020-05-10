@@ -12,7 +12,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 
 import com.google.android.exoplayer2.Player;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import me.vitormac.drippy.model.LoaderTask;
 import me.vitormac.drippy.model.MediaManager;
@@ -48,10 +54,15 @@ public class JavascriptBridge {
     }
 
     @JavascriptInterface
-    public void play(String idToken, String refreshToken, String data, String trackList) {
-        Track track = new Track(JsonParser.parseString(data).getAsJsonObject());
+    public void play(String idToken, String refreshToken, int index, String trackList) {
+        List<Track> tracks = new ArrayList<>();
+        for (JsonElement element : JsonParser.parseString(trackList).getAsJsonArray()) {
+            tracks.add(new Track(element.getAsJsonObject()));
+        }
+
         this.activity.runOnUiThread(() -> {
-            MediaManager.getInstance().play(this.activity, idToken, track);
+            Track track = tracks.get(index);
+            MediaManager.getInstance().play(this.activity, idToken, tracks, index);
             ((TextView) this.activity.findViewById(R.id.title)).setText(track.getTitle());
             ((TextView) this.activity.findViewById(R.id.artists)).setText(track.getArtists());
             new LoaderTask(this.activity.findViewById(R.id.artwork)).execute(track.getArtwork(2));
