@@ -10,8 +10,6 @@ import java.util.List;
 
 public class Track {
 
-    private static final String API_URL = "https://api.drippy.live";
-
     private final String id;
     private final String title;
     private final String album;
@@ -56,10 +54,6 @@ public class Track {
 
     public String getArtwork(int index) {
         return this.artworks.get(index);
-    }
-
-    public String getStreamURL(String idToken) {
-        return Joiner.on('/').join(Arrays.asList(API_URL, "stream", idToken, this.getId()));
     }
 
 }
