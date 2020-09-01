@@ -1,7 +1,6 @@
 package me.vitormac.drippy;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 
@@ -50,11 +49,6 @@ public class JavascriptBridge implements Player.EventListener {
     @JavascriptInterface
     public void toggle() {
         this.activity.runOnUiThread(() -> MediaManager.getInstance().toggle());
-    }
-
-    @JavascriptInterface
-    public void open() {
-        this.activity.startActivity(new Intent(this.activity, NowPlaying.class));
     }
 
     @Override

@@ -20,7 +20,6 @@ public class MainActivity extends AppCompatActivity {
         this.webView = new WebView(this);
         this.webView.setWebViewClient(new WebViewClient());
         this.webView.getSettings().setJavaScriptEnabled(true);
-        this.webView.addJavascriptInterface(new JavascriptBridge(this.webView, this), "native");
         this.webView.getSettings().setDomStorageEnabled(true);
         this.webView.loadUrl("https://drippy.live");
         this.setContentView(this.webView);
