@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -32,21 +33,19 @@ public class AutoUpdater extends AsyncTask<String, Void, Void> {
         this.dist = dist;
         this.preferences = activity.getPreferences(Context.MODE_PRIVATE);
         this.runnable = runnable;
-        if (!this.dist.exists())
-            this.dist.mkdir();
     }
 
     @Override
     protected Void doInBackground(String... strings) {
         boolean update;
-        String assetUrl;
+        String assetUrl, latest;
         Request request = new Request.Builder()
                 .url(strings[0]).build();
 
         try (Response response = this.client.newCall(request).execute()) {
             JsonObject object = JsonParser.parseString(response.body().string())
                     .getAsJsonObject();
-            String latest = object.get("tag_name").getAsString();
+            latest = object.get("tag_name").getAsString();
             assetUrl = object.get("assets").getAsJsonArray().get(0)
                     .getAsJsonObject().get("browser_download_url").getAsString();
 
@@ -54,7 +53,6 @@ public class AutoUpdater extends AsyncTask<String, Void, Void> {
                 String version = AutoUpdater.this.preferences.getString("version", latest);
                 update = !latest.equals(version);
             } else {
-                this.preferences.edit().putString("version", latest).apply();
                 update = true;
             }
         } catch (IOException ex) {
@@ -62,7 +60,11 @@ public class AutoUpdater extends AsyncTask<String, Void, Void> {
         }
 
         if (update && !StringUtils.isEmpty(assetUrl)) {
+            this.preferences.edit().putString("version", latest).apply();
             try (ZipInputStream stream = new ZipInputStream(new URL(assetUrl).openStream())) {
+                FileUtils.deleteDirectory(this.dist);
+
+                this.dist.mkdir();
                 byte[] buffer = new byte[2048];
                 for (ZipEntry entry; (entry = stream.getNextEntry()) != null; ) {
                     File file = new File(this.dist.getAbsolutePath(), entry.getName());
