@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -38,12 +39,6 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
                     return loader.shouldInterceptRequest(request.getUrl());
-                }
-
-                @Override
-                public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-                    // TODO trust Drippy's API certs and stuff, below code unsafe
-                    handler.proceed();
                 }
             });
 
