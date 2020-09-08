@@ -1,22 +1,13 @@
 package me.vitormac.drippy;
 
-import android.net.http.SslError;
 import android.os.Bundle;
-import android.webkit.SslErrorHandler;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebResourceResponse;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.webkit.WebViewAssetLoader;
-
-import java.io.File;
 
 import me.vitormac.drippy.bootstrap.AutoUpdater;
 import me.vitormac.drippy.model.MediaManager;
-import me.vitormac.drippy.webview.RouteHandler;
+import me.vitormac.drippy.webview.DrippyClient;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,19 +20,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         MediaManager.create(this);
 
-        File dist = new File(this.getFilesDir().getAbsolutePath() + "/dist");
-        WebViewAssetLoader loader = new WebViewAssetLoader.Builder().setDomain("drippy.live")
-                .addPathHandler("/", new RouteHandler(dist)).build();
-
-        new AutoUpdater(this, dist, () -> {
+        DrippyClient client = new DrippyClient(this);
+        new AutoUpdater(this, client.getDist(), () -> {
             this.webView = new WebView(this);
-            this.webView.setWebViewClient(new WebViewClient() {
-                @Override
-                public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-                    return loader.shouldInterceptRequest(request.getUrl());
-                }
-            });
-
+            this.webView.setWebViewClient(client);
             this.webView.getSettings().setJavaScriptEnabled(true);
             this.webView.getSettings().setDomStorageEnabled(true);
             this.webView.loadUrl("https://drippy.live");
