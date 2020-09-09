@@ -12,12 +12,13 @@ import androidx.webkit.WebViewAssetLoader;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URLConnection;
 
-import me.vitormac.drippy.wrapper.LocalWrapper;
-import me.vitormac.drippy.wrapper.RemoteWrapper;
-
-public class DrippyClient extends WebViewClient {
+public final class DrippyClient extends WebViewClient {
 
     private final File dist;
     private final WebViewAssetLoader loader;
@@ -36,10 +37,7 @@ public class DrippyClient extends WebViewClient {
     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
         if (StringUtils.equals(request.getUrl().getHost(), "api.drippy.live")
                 && StringUtils.equalsAny(request.getMethod(), "GET", "OPTIONS")) {
-            if (this.isConnected() && request.getMethod().equals("GET"))
-                return RemoteWrapper.request(request);
-
-            return LocalWrapper.request(request);
+            return Drippy.request(this.isConnected(), request);
         }
 
         return loader.shouldInterceptRequest(request.getUrl());
@@ -54,6 +52,39 @@ public class DrippyClient extends WebViewClient {
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = connectivityManager.getActiveNetworkInfo();
         return info != null && info.isConnected();
+    }
+
+    static class RouteHandler implements WebViewAssetLoader.PathHandler {
+
+        private final File root;
+        private final File index;
+
+        public RouteHandler(File root) {
+            this.root = root;
+            this.index = new File(root, "index.html");
+        }
+
+        @Override
+        public WebResourceResponse handle(String path) {
+            File object = new File(this.root, path);
+            try {
+                if (StringUtils.isEmpty(path) || !object.exists()) {
+                    return new WebResourceResponse("text/html", null,
+                            new BufferedInputStream(new FileInputStream(this.index)));
+                }
+
+                return new WebResourceResponse(this.guessMimeType(path), null,
+                        new BufferedInputStream(new FileInputStream(object)));
+            } catch (IOException e) {
+                return new WebResourceResponse(null, null, null);
+            }
+        }
+
+        private String guessMimeType(String file) {
+            String mimeType = URLConnection.guessContentTypeFromName(file);
+            return StringUtils.defaultIfEmpty(mimeType, "text/plain");
+        }
+
     }
 
 }
