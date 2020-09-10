@@ -20,19 +20,14 @@ public class SoundCloud extends ProviderBase<SoundCloudData> {
 
     @Override
     public WebResourceResponse stream(String range) throws IOException {
-        String uri = this.data.getUri();
-        HttpsURLConnection connection = (HttpsURLConnection) new URL(uri).openConnection();
-
+        URL url = new URL(this.data.getUri());
+        HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
         connection.setRequestProperty("Range", range);
-        if (connection.getResponseCode() == HttpsURLConnection.HTTP_PARTIAL) {
-            Map<String, String> headers = ProviderBase.getHeaders(connection,
-                    "Content-Length", "Content-Range");
 
-            return new WebResourceResponse("audio/mpeg", null, 206,
-                    "Partial Content", headers, connection.getInputStream());
-        }
-
-        return new WebResourceResponse(null, null, null);
+        Map<String, String> headers = ProviderBase.getHeaders(connection,
+                "Content-Length", "Content-Range");
+        return new WebResourceResponse("audio/mpeg", null, 206,
+                "Partial Content", headers, connection.getInputStream());
     }
 
     @Override
