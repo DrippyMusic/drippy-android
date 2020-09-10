@@ -43,7 +43,7 @@ final class Drippy {
         put("Content-Length", "0");
     }};
 
-    private ProviderBase session;
+    private ProviderBase<?> session;
     private final OkHttpClient client = new OkHttpClient();
 
     private final static Drippy INSTANCE = new Drippy();
@@ -119,7 +119,7 @@ final class Drippy {
     }
 
     private WebResourceResponse stream(String range) throws IOException {
-        ProviderBase provider = Objects.requireNonNull(this.session);
+        ProviderBase<?> provider = Objects.requireNonNull(this.session);
         return provider.stream(range);
     }
 

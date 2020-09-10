@@ -5,10 +5,9 @@ import android.webkit.WebResourceResponse;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.net.ssl.HttpsURLConnection;
 
 public abstract class ProviderBase<T> {
 
@@ -22,7 +21,7 @@ public abstract class ProviderBase<T> {
 
     protected abstract T map(JsonObject object);
 
-    protected static Map<String, String> getHeaders(HttpsURLConnection connection, String... headers) {
+    protected static Map<String, String> getHeaders(HttpURLConnection connection, String... headers) {
         Map<String, String> responseHeaders = new HashMap<>();
         responseHeaders.put("Access-Control-Allow-Origin", "*");
 
