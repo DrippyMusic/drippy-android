@@ -10,7 +10,9 @@ import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class SoundCloud extends ProviderBase {
+import me.vitormac.drippy.providers.model.SoundCloudData;
+
+public class SoundCloud extends ProviderBase<SoundCloudData> {
 
     public SoundCloud(JsonObject data) {
         super(data);
@@ -18,7 +20,7 @@ public class SoundCloud extends ProviderBase {
 
     @Override
     public WebResourceResponse stream(String range) throws IOException {
-        String uri = this.data.get("uri").getAsString();
+        String uri = this.data.getUri();
         HttpsURLConnection connection = (HttpsURLConnection) new URL(uri).openConnection();
 
         connection.setRequestProperty("Range", range);
@@ -31,6 +33,13 @@ public class SoundCloud extends ProviderBase {
         }
 
         return new WebResourceResponse(null, null, null);
+    }
+
+    @Override
+    protected SoundCloudData map(JsonObject object) {
+        SoundCloudData data = new SoundCloudData();
+        data.setUri(object.get("uri").getAsString());
+        return data;
     }
 
 }

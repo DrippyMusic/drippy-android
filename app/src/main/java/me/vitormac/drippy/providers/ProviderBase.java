@@ -10,15 +10,17 @@ import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public abstract class ProviderBase {
+public abstract class ProviderBase<T> {
 
-    protected final JsonObject data;
+    protected final T data;
 
     public ProviderBase(JsonObject data) {
-        this.data = data;
+        this.data = this.map(data);
     }
 
     public abstract WebResourceResponse stream(String range) throws IOException;
+
+    protected abstract T map(JsonObject object);
 
     protected static Map<String, String> getHeaders(HttpsURLConnection connection, String... headers) {
         Map<String, String> responseHeaders = new HashMap<>();
