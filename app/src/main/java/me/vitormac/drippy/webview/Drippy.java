@@ -85,28 +85,31 @@ final class Drippy {
                     return new WebResourceResponse(null, null,
                             200, "OK", DEFAULT_HEADERS, null);
                 case "/stream":
-                    return this.session(builder, request.getUrl());
+                    return this.session(builder, request.getUrl(), connected);
                 case "/audio":
                     String range = request.getRequestHeaders().get("Range");
                     return this.stream(StringUtils.defaultIfEmpty(range, "bytes=0-"));
             }
         }
 
-        return new WebResourceResponse(null, null, null);
+        return null;
     }
 
-    private WebResourceResponse session(Request.Builder request, Uri uri)
+    private WebResourceResponse session(Request.Builder request, Uri uri, boolean connected)
             throws IOException {
         List<String> segments = new ArrayList<>(uri.getPathSegments());
         segments.set(0, "data");
 
-        request.url(API_URL + '/' + StringUtils.join(segments, '/'));
-        try (Response response = this.client.newCall(request.build()).execute();
-             PipedOutputStream stream = new PipedOutputStream();
+        String id = segments.get(segments.size() - 1);
+        boolean cache = ProviderBase.getCache(id).exists();
+        try (PipedOutputStream stream = new PipedOutputStream();
              Writer writer = new OutputStreamWriter(stream)) {
-            ResponseBody body = Objects.requireNonNull(response.body());
-            JsonObject data = JsonParser.parseString(body.string()).getAsJsonObject();
-            this.session = DrippyUtils.getProvider(data, segments.get(segments.size() - 1));
+            if (cache) {
+                this.session = DrippyUtils.getProvider(id);
+            } else if (connected) {
+                JsonObject data = this.rsession(request, segments);
+                this.session = DrippyUtils.getProvider(data, id);
+            } else return null;
 
             JsonObject object = new JsonObject();
             object.addProperty("session",
@@ -115,6 +118,15 @@ final class Drippy {
 
             return new WebResourceResponse("application/json", null,
                     200, "OK", DEFAULT_HEADERS, new PipedInputStream(stream));
+        }
+    }
+
+    private JsonObject rsession(Request.Builder request, List<String> segments)
+            throws IOException {
+        request.url(API_URL + '/' + StringUtils.join(segments, '/'));
+        try (Response response = this.client.newCall(request.build()).execute()) {
+            ResponseBody body = Objects.requireNonNull(response.body());
+            return JsonParser.parseString(body.string()).getAsJsonObject();
         }
     }
 

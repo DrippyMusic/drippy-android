@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import java.util.List;
 import java.util.Map;
 
+import me.vitormac.drippy.providers.CacheProvider;
 import me.vitormac.drippy.providers.Deezer;
 import me.vitormac.drippy.providers.ProviderBase;
 import me.vitormac.drippy.providers.SoundCloud;
@@ -32,7 +33,15 @@ class DrippyUtils {
         return builder;
     }
 
+    protected static ProviderBase<?> getProvider(String id) {
+        return DrippyUtils.getProvider(null, id);
+    }
+
     protected static ProviderBase<?> getProvider(JsonObject object, String id) {
+        if (object == null) {
+            return new CacheProvider(id);
+        }
+
         switch (object.get("id").getAsInt()) {
             case 0:
                 return new SoundCloud(object, id);

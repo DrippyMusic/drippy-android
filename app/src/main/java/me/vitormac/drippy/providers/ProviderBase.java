@@ -5,7 +5,6 @@ import android.webkit.WebResourceResponse;
 import com.google.gson.JsonObject;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,24 +20,14 @@ import me.vitormac.drippy.webview.DrippyClient;
 public abstract class ProviderBase<T extends DataModel> {
 
     protected final T data;
-    private final String id;
+    protected final String id;
 
     public ProviderBase(JsonObject data, String id) {
         this.data = this.map(data);
         this.id = id;
     }
 
-    public final WebResourceResponse stream(String range) throws IOException {
-        File file = this.getCache();
-        if (file.exists()) {
-            Map<String, String> headers = new HashMap<String, String>() {{
-                put("Access-Control-Allow-Origin", "*");
-            }};
-
-            return new WebResourceResponse(this.getMimeType(), null,
-                    200, "OK", headers, new FileInputStream(file));
-        }
-
+    public WebResourceResponse stream(String range) throws IOException {
         URL url = new URL(this.data.getUri());
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestProperty("Range", range);
@@ -54,7 +43,7 @@ public abstract class ProviderBase<T extends DataModel> {
     }
 
     protected final OutputStream getOutputStream() throws IOException {
-        return new FileOutputStream(this.getCache());
+        return new FileOutputStream(ProviderBase.getCache(this.id));
     }
 
     protected abstract String getMimeType();
@@ -73,10 +62,10 @@ public abstract class ProviderBase<T extends DataModel> {
         return responseHeaders;
     }
 
-    private File getCache() {
+    public static File getCache(String id) {
         File file = new File(DrippyClient.getData(), "data");
         if (file.exists() || file.mkdir()) {
-            return new File(file, this.id);
+            return new File(file, id);
         }
 
         throw new RuntimeException("No data dir");
