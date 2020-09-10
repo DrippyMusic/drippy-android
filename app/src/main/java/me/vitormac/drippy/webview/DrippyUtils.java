@@ -32,12 +32,12 @@ class DrippyUtils {
         return builder;
     }
 
-    protected static ProviderBase<?> getProvider(JsonObject object) {
+    protected static ProviderBase<?> getProvider(JsonObject object, String id) {
         switch (object.get("id").getAsInt()) {
             case 0:
-                return new SoundCloud(object);
+                return new SoundCloud(object, id);
             case 1:
-                return new Deezer(object);
+                return new Deezer(object, id);
             default:
                 throw new IllegalArgumentException("Invalid provider");
         }

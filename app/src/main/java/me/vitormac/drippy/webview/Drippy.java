@@ -106,7 +106,7 @@ final class Drippy {
              Writer writer = new OutputStreamWriter(stream)) {
             ResponseBody body = Objects.requireNonNull(response.body());
             JsonObject data = JsonParser.parseString(body.string()).getAsJsonObject();
-            this.session = DrippyUtils.getProvider(data);
+            this.session = DrippyUtils.getProvider(data, segments.get(segments.size() - 1));
 
             JsonObject object = new JsonObject();
             object.addProperty("session",

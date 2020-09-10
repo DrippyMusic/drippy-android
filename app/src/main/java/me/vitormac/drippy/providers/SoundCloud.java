@@ -1,38 +1,23 @@
 package me.vitormac.drippy.providers;
 
-import android.webkit.WebResourceResponse;
-
 import com.google.gson.JsonObject;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.Map;
+import me.vitormac.drippy.providers.model.DataModel;
 
-import javax.net.ssl.HttpsURLConnection;
+public class SoundCloud extends ProviderBase<DataModel> {
 
-import me.vitormac.drippy.providers.model.SoundCloudData;
-
-public class SoundCloud extends ProviderBase<SoundCloudData> {
-
-    public SoundCloud(JsonObject data) {
-        super(data);
+    public SoundCloud(JsonObject data, String id) {
+        super(data, id);
     }
 
     @Override
-    public WebResourceResponse stream(String range) throws IOException {
-        URL url = new URL(this.data.getUri());
-        HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-        connection.setRequestProperty("Range", range);
-
-        Map<String, String> headers = ProviderBase.getHeaders(connection,
-                "Content-Length", "Content-Range");
-        return new WebResourceResponse("audio/mpeg", null, 206,
-                "Partial Content", headers, connection.getInputStream());
+    protected String getMimeType() {
+        return "audio/mpeg";
     }
 
     @Override
-    protected SoundCloudData map(JsonObject object) {
-        SoundCloudData data = new SoundCloudData();
+    protected DataModel map(JsonObject object) {
+        DataModel data = new DataModel();
         data.setUri(object.get("uri").getAsString());
         return data;
     }
