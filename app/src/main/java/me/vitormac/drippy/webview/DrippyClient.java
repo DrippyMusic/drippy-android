@@ -24,6 +24,7 @@ public final class DrippyClient extends WebViewClient {
     private final WebViewAssetLoader loader;
 
     private final Context context;
+    private final Drippy drippy = Drippy.getInstance();
 
     public DrippyClient(Context context) {
         super();
@@ -38,7 +39,7 @@ public final class DrippyClient extends WebViewClient {
         if (StringUtils.equals(request.getUrl().getHost(), "api.drippy.live")
                 && StringUtils.equalsAny(request.getMethod(), "GET", "OPTIONS")) {
             try {
-                return Drippy.request(this.isConnected(), request);
+                return this.drippy.request(this.isConnected(), request);
             } catch (IOException ex) {
                 return super.shouldInterceptRequest(view, request);
             }

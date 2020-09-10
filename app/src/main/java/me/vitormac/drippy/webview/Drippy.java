@@ -30,7 +30,6 @@ import okhttp3.ResponseBody;
 final class Drippy {
 
     private static final String API_URL = "https://api.drippy.live";
-    private static final OkHttpClient CLIENT = new OkHttpClient();
 
     private static final Map<String, String> DEFAULT_HEADERS = new HashMap<String, String>() {{
         put("Access-Control-Allow-Origin", "*");
@@ -44,12 +43,19 @@ final class Drippy {
         put("Content-Length", "0");
     }};
 
-    private static final Map<String, ProviderBase> SESSIONS = new HashMap<>();
+    private ProviderBase session;
+    private final OkHttpClient client = new OkHttpClient();
+
+    private final static Drippy INSTANCE = new Drippy();
+
+    protected static Drippy getInstance() {
+        return INSTANCE;
+    }
 
     private Drippy() {
     }
 
-    protected static WebResourceResponse request(boolean connected, WebResourceRequest request)
+    protected WebResourceResponse request(boolean connected, WebResourceRequest request)
             throws IOException {
         if (request.getMethod().equals("OPTIONS")) {
             return new WebResourceResponse(null, null,
@@ -60,7 +66,7 @@ final class Drippy {
         Request.Builder builder = DrippyUtils.builder(request);
 
         if (connected && !StringUtils.equalsAny(path, "/stream", "/audio")) {
-            Response response = CLIENT.newCall(builder.build()).execute();
+            Response response = this.client.newCall(builder.build()).execute();
 
             Map<String, String> headers = new HashMap<>();
             for (String header : response.headers().names()) {
@@ -79,34 +85,32 @@ final class Drippy {
                     return new WebResourceResponse(null, null,
                             200, "OK", DEFAULT_HEADERS, null);
                 case "/stream":
-                    return Drippy.session(builder, request.getUrl());
+                    return this.session(builder, request.getUrl());
                 case "/audio":
                     String range = request.getRequestHeaders().get("Range");
-                    return Drippy.stream(StringUtils.defaultIfEmpty(range, "bytes=0-"),
-                            request.getUrl());
+                    return this.stream(StringUtils.defaultIfEmpty(range, "bytes=0-"));
             }
         }
 
         return new WebResourceResponse(null, null, null);
     }
 
-    private static WebResourceResponse session(Request.Builder request, Uri uri)
+    private WebResourceResponse session(Request.Builder request, Uri uri)
             throws IOException {
         List<String> segments = new ArrayList<>(uri.getPathSegments());
         segments.set(0, "data");
 
         request.url(API_URL + '/' + StringUtils.join(segments, '/'));
-        try (Response response = CLIENT.newCall(request.build()).execute();
+        try (Response response = this.client.newCall(request.build()).execute();
              PipedOutputStream stream = new PipedOutputStream();
              Writer writer = new OutputStreamWriter(stream)) {
             ResponseBody body = Objects.requireNonNull(response.body());
             JsonObject data = JsonParser.parseString(body.string()).getAsJsonObject();
-
-            String session = UUID.randomUUID().toString();
-            SESSIONS.put(session, DrippyUtils.getProvider(data));
+            this.session = DrippyUtils.getProvider(data);
 
             JsonObject object = new JsonObject();
-            object.addProperty("session", session);
+            object.addProperty("session",
+                    UUID.randomUUID().toString());
             writer.write(object.toString());
 
             return new WebResourceResponse("application/json", null,
@@ -114,12 +118,8 @@ final class Drippy {
         }
     }
 
-    private static WebResourceResponse stream(String range, Uri uri)
-            throws IOException {
-        List<String> segments = new ArrayList<>(uri.getPathSegments());
-        String session = segments.get(segments.size() - 1);
-
-        ProviderBase provider = Objects.requireNonNull(SESSIONS.remove(session));
+    private WebResourceResponse stream(String range) throws IOException {
+        ProviderBase provider = Objects.requireNonNull(this.session);
         return provider.stream(range);
     }
 
