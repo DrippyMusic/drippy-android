@@ -1,6 +1,6 @@
 package me.vitormac.drippy.providers.model;
 
-public class SoundCloudData {
+public class DataModel {
 
     private String uri;
 
