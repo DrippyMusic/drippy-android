@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import java.util.List;
 import java.util.Map;
 
+import me.vitormac.drippy.providers.Deezer;
 import me.vitormac.drippy.providers.ProviderBase;
 import me.vitormac.drippy.providers.SoundCloud;
 import okhttp3.Request;
@@ -31,10 +32,12 @@ class DrippyUtils {
         return builder;
     }
 
-    protected static ProviderBase getProvider(JsonObject object) {
+    protected static ProviderBase<?> getProvider(JsonObject object) {
         switch (object.get("id").getAsInt()) {
             case 0:
                 return new SoundCloud(object);
+            case 1:
+                return new Deezer(object);
             default:
                 throw new IllegalArgumentException("Invalid provider");
         }
