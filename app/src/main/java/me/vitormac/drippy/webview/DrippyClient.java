@@ -37,7 +37,11 @@ public final class DrippyClient extends WebViewClient {
     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
         if (StringUtils.equals(request.getUrl().getHost(), "api.drippy.live")
                 && StringUtils.equalsAny(request.getMethod(), "GET", "OPTIONS")) {
-            return Drippy.request(this.isConnected(), request);
+            try {
+                return Drippy.request(this.isConnected(), request);
+            } catch (IOException ex) {
+                return super.shouldInterceptRequest(view, request);
+            }
         }
 
         return loader.shouldInterceptRequest(request.getUrl());
