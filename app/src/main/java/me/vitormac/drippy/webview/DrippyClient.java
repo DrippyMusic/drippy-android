@@ -20,6 +20,8 @@ import java.net.URLConnection;
 
 public final class DrippyClient extends WebViewClient {
 
+    private static File DATA_DIR;
+
     private final File dist;
     private final WebViewAssetLoader loader;
 
@@ -32,6 +34,7 @@ public final class DrippyClient extends WebViewClient {
         this.dist = new File(context.getFilesDir().getAbsolutePath() + "/dist");
         this.loader = new WebViewAssetLoader.Builder().setDomain("drippy.live")
                 .addPathHandler("/", new RouteHandler(dist)).build();
+        DATA_DIR = context.getFilesDir();
     }
 
     @Override
@@ -48,15 +51,19 @@ public final class DrippyClient extends WebViewClient {
         return loader.shouldInterceptRequest(request.getUrl());
     }
 
-    public File getDist() {
-        return dist;
-    }
-
     private boolean isConnected() {
         ConnectivityManager connectivityManager = (ConnectivityManager) this.context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = connectivityManager.getActiveNetworkInfo();
         return info != null && info.isConnected();
+    }
+
+    public File getDist() {
+        return dist;
+    }
+
+    public static File getData() {
+        return DATA_DIR;
     }
 
     static class RouteHandler implements WebViewAssetLoader.PathHandler {
