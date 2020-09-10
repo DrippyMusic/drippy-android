@@ -6,7 +6,6 @@ import android.webkit.WebView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import me.vitormac.drippy.bootstrap.AutoUpdater;
-import me.vitormac.drippy.model.MediaManager;
 import me.vitormac.drippy.webview.DrippyClient;
 
 public class MainActivity extends AppCompatActivity {
@@ -18,7 +17,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MediaManager.create(this);
 
         DrippyClient client = new DrippyClient(this);
         new AutoUpdater(this, client.getDist(), () -> {
