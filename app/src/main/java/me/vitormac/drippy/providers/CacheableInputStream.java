@@ -1,5 +1,7 @@
 package me.vitormac.drippy.providers;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -10,8 +12,8 @@ public class CacheableInputStream extends InputStream {
     protected final OutputStream output;
 
     public CacheableInputStream(InputStream stream, OutputStream output) {
-        this.stream = stream;
-        this.output = output;
+        this.stream = new BufferedInputStream(stream);
+        this.output = new BufferedOutputStream(output);
     }
 
     @Override
