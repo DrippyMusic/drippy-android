@@ -23,11 +23,10 @@ public class CacheableInputStream extends InputStream {
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        byte[] data = new byte[4096];
         int i = 0;
 
         do {
-            int read = this.stream.read(data, i, len - i);
+            int read = this.stream.read(b, i, len - i);
             if (read < 0) {
                 if (i == 0) {
                     return -1;
@@ -38,8 +37,7 @@ public class CacheableInputStream extends InputStream {
 
             i += read;
         } while (i < len);
-        System.arraycopy(data, 0, b, 0, data.length);
-        this.output.write(data);
+        this.output.write(b);
 
         return i;
     }
