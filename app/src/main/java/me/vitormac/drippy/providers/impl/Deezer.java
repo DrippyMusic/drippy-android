@@ -1,4 +1,4 @@
-package me.vitormac.drippy.providers;
+package me.vitormac.drippy.providers.impl;
 
 import com.google.gson.JsonObject;
 
@@ -18,6 +18,8 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import me.vitormac.drippy.providers.CacheableInputStream;
+import me.vitormac.drippy.providers.ProviderBase;
 import me.vitormac.drippy.providers.model.DeezerData;
 
 public class Deezer extends ProviderBase<DeezerData> {

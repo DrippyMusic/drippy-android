@@ -78,7 +78,6 @@ final class Drippy {
                     response.code(), response.message(), headers, body.byteStream());
         }
 
-
         if (!StringUtils.isEmpty(path)) {
             switch (path) {
                 case "/validate":

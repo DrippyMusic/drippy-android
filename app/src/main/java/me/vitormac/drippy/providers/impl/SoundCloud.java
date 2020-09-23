@@ -1,7 +1,8 @@
-package me.vitormac.drippy.providers;
+package me.vitormac.drippy.providers.impl;
 
 import com.google.gson.JsonObject;
 
+import me.vitormac.drippy.providers.ProviderBase;
 import me.vitormac.drippy.providers.model.DataModel;
 
 public class SoundCloud extends ProviderBase<DataModel> {

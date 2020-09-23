@@ -1,4 +1,4 @@
-package me.vitormac.drippy.providers;
+package me.vitormac.drippy.providers.impl;
 
 import android.webkit.WebResourceResponse;
 
@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import me.vitormac.drippy.providers.ProviderBase;
 import me.vitormac.drippy.providers.model.DataModel;
 
 public class CacheProvider extends ProviderBase<DataModel> {

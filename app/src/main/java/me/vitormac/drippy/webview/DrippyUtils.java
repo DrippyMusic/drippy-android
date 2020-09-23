@@ -8,10 +8,10 @@ import com.google.gson.JsonObject;
 import java.util.List;
 import java.util.Map;
 
-import me.vitormac.drippy.providers.CacheProvider;
-import me.vitormac.drippy.providers.Deezer;
+import me.vitormac.drippy.providers.impl.CacheProvider;
+import me.vitormac.drippy.providers.impl.Deezer;
 import me.vitormac.drippy.providers.ProviderBase;
-import me.vitormac.drippy.providers.SoundCloud;
+import me.vitormac.drippy.providers.impl.SoundCloud;
 import okhttp3.Request;
 
 class DrippyUtils {
