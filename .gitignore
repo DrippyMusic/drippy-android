@@ -1,6 +1,7 @@
 *.iml
 *.prefs
 .idea
+.vscode
 .gradle
 /gradle
 /gradlew
