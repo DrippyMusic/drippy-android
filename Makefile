@@ -29,9 +29,8 @@ endef
 ffmpeg/android-libs/armeabi-v7a:
 	cd ffmpeg && \
 	./configure --prefix=android-libs/armeabi-v7a --arch=arm --cpu=armv7-a \
-		--cross-prefix="$(TOOLCHAIN_PATH)/armv7a-linux-androideabi$(MIN_SDK_VERSION)-" \
-		--nm="$(TOOLCHAIN_PATH)/arm-linux-androideabi-nm" \
-		--strip=$(TOOLCHAIN_PATH)/arm-linux-androideabi-strip \
+		--cross-prefix="$(TOOLCHAIN_PATH)/arm-linux-androideabi-" \
+		--cc="$(TOOLCHAIN_PATH)/armv7a-linux-androideabi$(MIN_SDK_VERSION)-clang" \
 		--extra-cflags="-march=armv7-a -mfloat-abi=softfp" \
 		--extra-ldflags="-Wl,--fix-cortex-a8" \
 		$(DEFAULT_FLAGS) $(ENABLED_CODECS)
@@ -39,25 +38,22 @@ ffmpeg/android-libs/armeabi-v7a:
 ffmpeg/android-libs/arm64-v8a:
 	cd ffmpeg && \
 	./configure --prefix=android-libs/arm64-v8a --arch=aarch64 --cpu=armv8-a \
-		--cross-prefix="$(TOOLCHAIN_PATH)/aarch64-linux-android$(MIN_SDK_VERSION)-" \
-		--nm="$(TOOLCHAIN_PATH)/aarch64-linux-android-nm" \
-		--strip="$(TOOLCHAIN_PATH)/aarch64-linux-android-strip" \
+		--cross-prefix="$(TOOLCHAIN_PATH)/aarch64-linux-android-" \
+		--cc="$(TOOLCHAIN_PATH)/aarch64-linux-android$(MIN_SDK_VERSION)-clang" \
 		$(DEFAULT_FLAGS) $(ENABLED_CODECS)
 
 ffmpeg/android-libs/x86:
 	cd ffmpeg && \
 	./configure --prefix=android-libs/x86 --arch=x86 --cpu=i686 \
-		--cross-prefix="$(TOOLCHAIN_PATH)/i686-linux-android$(MIN_SDK_VERSION)-" \
-		--nm="$(TOOLCHAIN_PATH)/i686-linux-android-nm" \
-		--strip="$(TOOLCHAIN_PATH)/i686-linux-android-strip" \
+		--cross-prefix="$(TOOLCHAIN_PATH)/i686-linux-android-" \
+		--cc="$(TOOLCHAIN_PATH)/i686-linux-android$(MIN_SDK_VERSION)-clang" \
 		--disable-asm $(DEFAULT_FLAGS) $(ENABLED_CODECS)
 
 ffmpeg/android-libs/x86_64:
 	cd ffmpeg && \
 	./configure --prefix=android-libs/x86_64 --arch=x86_64 --cpu=x86_64 \
-		--cross-prefix="$(TOOLCHAIN_PATH)/x86_64-linux-android$(MIN_SDK_VERSION)-" \
-		--nm="$(TOOLCHAIN_PATH)/x86_64-linux-android-nm" \
-		--strip="$(TOOLCHAIN_PATH)/x86_64-linux-android-strip" \
+		--cross-prefix="$(TOOLCHAIN_PATH)/x86_64-linux-android-" \
+		--cc="$(TOOLCHAIN_PATH)/x86_64-linux-android$(MIN_SDK_VERSION)-clang" \
 		--disable-asm $(DEFAULT_FLAGS) $(ENABLED_CODECS)
 
 ffmpeg/android-libs/armeabi-v7a/lib ffmpeg/android-libs/arm64-v8a/lib ffmpeg/android-libs/x86/lib ffmpeg/android-libs/x86_64/lib:
