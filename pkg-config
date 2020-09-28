@@ -1,0 +1,16 @@
+#!/bin/sh
+
+case "$1" in
+--exists)
+    exit 0
+    ;;
+--cflags)
+    echo "-I$OPUS_DIR/include"
+    ;;
+--libs)
+    echo "-L$OPUS_DIR/obj/local/$ANDROID_ABI -l:libopus.a -lm"
+    ;;
+*)
+    echo "pkg-config used for ffmpeg"
+    ;;
+esac
