@@ -1,8 +1,5 @@
 MIN_SDK_VERSION=21
-TOOLCHAIN_PATH=$(ANDROID_NDK)/toolchains/llvm/prebuilt/$(HOST)/bin
-
-OPUS_DIR=$(CURDIR)/opus
-PKG_CONFIG=$(CURDIR)/pkg-config
+TOOLCHAIN_PATH=$(ANDROID_NDK)/toolchains/llvm/prebuilt/$(HOST)
 
 define DEFAULT_FLAGS
 --target-os=android \
@@ -26,43 +23,37 @@ define ENABLED_CODECS
 --enable-demuxer=aac,mp3
 endef
 
+define EXTRA_ARM_FLAGS
+--extra-cflags="-march=armv7-a -mfloat-abi=softfp" \
+--extra-ldflags="-Wl,--fix-cortex-a8"
+endef
+
 ffmpeg/android-libs/armeabi-v7a: ANDROID_ABI=armeabi-v7a
-ffmpeg/android-libs/armeabi-v7a:
-	cd ffmpeg && \
-	./configure --prefix=android-libs/armeabi-v7a --arch=arm --cpu=armv7-a \
-		--cross-prefix="$(TOOLCHAIN_PATH)/arm-linux-androideabi-" \
-		--cc="$(TOOLCHAIN_PATH)/armv7a-linux-androideabi$(MIN_SDK_VERSION)-clang" \
-		--pkg-config="$(PKG_CONFIG)" \
-		--extra-cflags="-march=armv7-a -mfloat-abi=softfp" \
-		--extra-ldflags="-Wl,--fix-cortex-a8" \
-		$(DEFAULT_FLAGS) $(ENABLED_CODECS)
+ffmpeg/android-libs/armeabi-v7a: ARCH=arm
+ffmpeg/android-libs/armeabi-v7a: CPU=armv7-a
+ffmpeg/android-libs/armeabi-v7a: PREFIX=arm-linux-androideabi
+ffmpeg/android-libs/armeabi-v7a: CC_PREFIX=armv7a-linux-androideabi
+ffmpeg/android-libs/armeabi-v7a: EXTRA_FLAGS=$(EXTRA_ARM_FLAGS)
 
 ffmpeg/android-libs/arm64-v8a: ANDROID_ABI=arm64-v8a
-ffmpeg/android-libs/arm64-v8a:
-	cd ffmpeg && \
-	./configure --prefix=android-libs/arm64-v8a --arch=aarch64 --cpu=armv8-a \
-		--cross-prefix="$(TOOLCHAIN_PATH)/aarch64-linux-android-" \
-		--cc="$(TOOLCHAIN_PATH)/aarch64-linux-android$(MIN_SDK_VERSION)-clang" \
-		--pkg-config="$(PKG_CONFIG)" \
-		$(DEFAULT_FLAGS) $(ENABLED_CODECS)
+ffmpeg/android-libs/arm64-v8a: ARCH=aarch64
+ffmpeg/android-libs/arm64-v8a: CPU=armv8-a
+ffmpeg/android-libs/arm64-v8a: PREFIX=aarch64-linux-android
 
 ffmpeg/android-libs/x86: ANDROID_ABI=x86
-ffmpeg/android-libs/x86:
-	cd ffmpeg && \
-	./configure --prefix=android-libs/x86 --arch=x86 --cpu=i686 \
-		--cross-prefix="$(TOOLCHAIN_PATH)/i686-linux-android-" \
-		--cc="$(TOOLCHAIN_PATH)/i686-linux-android$(MIN_SDK_VERSION)-clang" \
-		--pkg-config="$(PKG_CONFIG)" \
-		--disable-asm $(DEFAULT_FLAGS) $(ENABLED_CODECS)
+ffmpeg/android-libs/x86: ARCH=x86
+ffmpeg/android-libs/x86: CPU=i686
+ffmpeg/android-libs/x86: PREFIX=i686-linux-android
+ffmpeg/android-libs/x86: EXTRA_FLAGS=--disable-asm
 
 ffmpeg/android-libs/x86_64: ANDROID_ABI=x86_64
-ffmpeg/android-libs/x86_64:
-	cd ffmpeg && \
-	./configure --prefix=android-libs/x86_64 --arch=x86_64 --cpu=x86_64 \
-		--cross-prefix="$(TOOLCHAIN_PATH)/x86_64-linux-android-" \
-		--cc="$(TOOLCHAIN_PATH)/x86_64-linux-android$(MIN_SDK_VERSION)-clang" \
-		--pkg-config="$(PKG_CONFIG)" \
-		--disable-asm $(DEFAULT_FLAGS) $(ENABLED_CODECS)
+ffmpeg/android-libs/x86_64: ARCH=x86_64
+ffmpeg/android-libs/x86_64: CPU=x86_64
+ffmpeg/android-libs/x86_64: PREFIX=x86_64-linux-android
+ffmpeg/android-libs/x86_64: EXTRA_FLAGS=--disable-asm
+
+ffmpeg/android-libs/armeabi-v7a ffmpeg/android-libs/arm64-v8a ffmpeg/android-libs/x86 ffmpeg/android-libs/x86_64:
+	@./ffmpeg.sh
 
 ffmpeg/android-libs/armeabi-v7a/lib ffmpeg/android-libs/arm64-v8a/lib ffmpeg/android-libs/x86/lib ffmpeg/android-libs/x86_64/lib:
 	$(MAKE) -C ffmpeg -j4
