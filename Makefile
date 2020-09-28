@@ -1,5 +1,6 @@
 MIN_SDK_VERSION=21
 TOOLCHAIN_PATH=$(ANDROID_NDK)/toolchains/llvm/prebuilt/$(HOST)/bin
+ANDROID_LIBS=$(CURDIR)/ffmpeg/android-libs
 
 define DEFAULT_FLAGS
 --target-os=android \
@@ -60,9 +61,18 @@ ffmpeg/android-libs/armeabi-v7a/lib ffmpeg/android-libs/arm64-v8a/lib ffmpeg/and
 	$(MAKE) -C ffmpeg -j4
 	$(MAKE) -C ffmpeg install
 
-ffmpeg/ffbuild/config.mak:
-	cd ffmpeg && \
-	./configure --disable-x86asm
+ffmpeg/ffbuild/config.mak: opus/Makefile
+	git submodule update --init ffmpeg
+	cd ffmpeg && ./configure --disable-x86asm
+
+opus/Makefile: opus/autogen.sh
+	cd opus && \
+	./configure --prefix=$(ANDROID_LIBS)/external \
+		--disable-shared --disable-extra-programs --disable-doc
+
+opus/autogen.sh:
+	git submodule update --init opus
+	cd opus && ./autogen.sh
 
 configure: ffmpeg/ffbuild/config.mak
 
