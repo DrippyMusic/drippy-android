@@ -5,8 +5,11 @@ import android.webkit.WebView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.io.IOException;
+
 import me.vitormac.drippy.bootstrap.AutoUpdater;
 import me.vitormac.drippy.webview.DrippyClient;
+import me.vitormac.drippy.webview.InternalServer;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -17,6 +20,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        System.setProperty("data.dir", getFilesDir().getAbsolutePath());
+        System.setProperty("native.dir", getApplicationInfo().nativeLibraryDir);
+
+        try {
+            new InternalServer().start();
+        } catch (IOException e) {
+            System.err.println("Internal server couldn't be loaded: " + e.getMessage());
+            System.exit(0);
+        }
 
         DrippyClient client = new DrippyClient(this);
         new AutoUpdater(this, client.getDist(), () -> {
