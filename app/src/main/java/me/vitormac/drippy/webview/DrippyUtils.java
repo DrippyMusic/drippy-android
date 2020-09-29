@@ -1,18 +1,15 @@
 package me.vitormac.drippy.webview;
 
 import android.net.Uri;
-import android.webkit.WebResourceRequest;
 
 import com.google.gson.JsonObject;
 
 import java.util.List;
-import java.util.Map;
 
+import me.vitormac.drippy.providers.ProviderBase;
 import me.vitormac.drippy.providers.impl.CacheProvider;
 import me.vitormac.drippy.providers.impl.Deezer;
-import me.vitormac.drippy.providers.ProviderBase;
 import me.vitormac.drippy.providers.impl.SoundCloud;
-import okhttp3.Request;
 
 class DrippyUtils {
 
@@ -21,20 +18,6 @@ class DrippyUtils {
         if (segments.isEmpty()) return "/";
 
         return "/" + segments.get(0);
-    }
-
-    protected static Request.Builder builder(WebResourceRequest request) {
-        Request.Builder builder = new Request.Builder()
-                .url(request.getUrl().toString());
-        for (Map.Entry<String, String> entry : request.getRequestHeaders().entrySet()) {
-            builder.header(entry.getKey(), entry.getValue());
-        }
-
-        return builder;
-    }
-
-    protected static ProviderBase<?> getProvider(String id) {
-        return DrippyUtils.getProvider(null, id);
     }
 
     protected static ProviderBase<?> getProvider(JsonObject object, String id) {

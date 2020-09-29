@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import me.vitormac.drippy.providers.model.DataModel;
-import me.vitormac.drippy.webview.DrippyClient;
 
 public abstract class ProviderBase<T extends DataModel> {
 
@@ -63,7 +62,7 @@ public abstract class ProviderBase<T extends DataModel> {
     }
 
     public static File getCache(String id) {
-        File file = new File(DrippyClient.getData(), "data");
+        File file = new File(System.getProperty("data.dir"), "data");
         if (file.exists() || file.mkdir()) {
             return new File(file, id);
         }
