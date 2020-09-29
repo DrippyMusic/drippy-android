@@ -2,6 +2,7 @@ MIN_SDK_VERSION=21
 TOOLCHAIN_PATH=$(ANDROID_NDK)/toolchains/llvm/prebuilt/$(HOST)
 
 ANDROID_LIBS=ffmpeg/android-libs
+APP_RESOURCES=app/src/main/resources/lib
 
 define DEFAULT_FLAGS
 --target-os=android \
@@ -51,6 +52,9 @@ $(ANDROID_LIBS)/armeabi-v7a $(ANDROID_LIBS)/arm64-v8a $(ANDROID_LIBS)/x86 $(ANDR
 	$(MAKE) -C ffmpeg -j4
 	$(MAKE) -C ffmpeg install
 
+$(APP_RESOURCES)/armeabi-v7a $(APP_RESOURCES)/arm64-v8a $(APP_RESOURCES)/x86 $(APP_RESOURCES)/x86_64:
+	@mkdir -p $@ && cp $(ANDROID_LIBS)/$(lastword $(subst /, , $@))/bin/ffmpeg $@
+
 ffmpeg/ffbuild/config.mak: opus/autogen.sh
 	git submodule update --init ffmpeg
 	cd ffmpeg && ./configure --disable-x86asm
@@ -66,9 +70,10 @@ clean:
 
 dist-clean:
 	@rm -rf $(ANDROID_LIBS)
+	@rm -rf $(APP_RESOURCES)
 
 .SECONDEXPANSION:
-armeabi-v7a arm64-v8a x86 x86_64: $(ANDROID_LIBS)/$$@
+armeabi-v7a arm64-v8a x86 x86_64: $(ANDROID_LIBS)/$$@ $(APP_RESOURCES)/$$@
 
 .EXPORT_ALL_VARIABLES:
 .PHONY: armeabi-v7a arm64-v8a x86 x86_64 clean dist-clean
