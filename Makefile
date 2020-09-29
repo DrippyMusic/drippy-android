@@ -25,17 +25,11 @@ define ENABLED_CODECS
 --enable-demuxer=aac,mp3
 endef
 
-define EXTRA_ARM_FLAGS
---extra-cflags="-march=armv7-a -mfloat-abi=softfp" \
---extra-ldflags="-Wl,--fix-cortex-a8"
-endef
-
 $(ANDROID_LIBS)/armeabi-v7a: ANDROID_ABI=armeabi-v7a
 $(ANDROID_LIBS)/armeabi-v7a: ARCH=arm
 $(ANDROID_LIBS)/armeabi-v7a: CPU=armv7-a
 $(ANDROID_LIBS)/armeabi-v7a: PREFIX=arm-linux-androideabi
 $(ANDROID_LIBS)/armeabi-v7a: CC_PREFIX=armv7a-linux-androideabi
-$(ANDROID_LIBS)/armeabi-v7a: EXTRA_FLAGS=$(EXTRA_ARM_FLAGS)
 
 $(ANDROID_LIBS)/arm64-v8a: ANDROID_ABI=arm64-v8a
 $(ANDROID_LIBS)/arm64-v8a: ARCH=aarch64
@@ -46,13 +40,11 @@ $(ANDROID_LIBS)/x86: ANDROID_ABI=x86
 $(ANDROID_LIBS)/x86: ARCH=x86
 $(ANDROID_LIBS)/x86: CPU=i686
 $(ANDROID_LIBS)/x86: PREFIX=i686-linux-android
-$(ANDROID_LIBS)/x86: EXTRA_FLAGS=--disable-asm
 
 $(ANDROID_LIBS)/x86_64: ANDROID_ABI=x86_64
 $(ANDROID_LIBS)/x86_64: ARCH=x86_64
 $(ANDROID_LIBS)/x86_64: CPU=x86_64
 $(ANDROID_LIBS)/x86_64: PREFIX=x86_64-linux-android
-$(ANDROID_LIBS)/x86_64: EXTRA_FLAGS=--disable-asm
 
 $(ANDROID_LIBS)/armeabi-v7a $(ANDROID_LIBS)/arm64-v8a $(ANDROID_LIBS)/x86 $(ANDROID_LIBS)/x86_64:
 	@./ffmpeg.sh && \
