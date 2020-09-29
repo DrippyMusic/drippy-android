@@ -1,6 +1,8 @@
 MIN_SDK_VERSION=21
 TOOLCHAIN_PATH=$(ANDROID_NDK)/toolchains/llvm/prebuilt/$(HOST)
 
+ANDROID_LIBS=ffmpeg/android-libs
+
 define DEFAULT_FLAGS
 --target-os=android \
 --disable-doc \
@@ -13,7 +15,7 @@ define DEFAULT_FLAGS
 --disable-symver \
 --enable-libopus \
 --enable-filter=aresample \
---enable-protocol=file
+--enable-protocol=file,pipe
 endef
 
 define ENABLED_CODECS
@@ -28,34 +30,32 @@ define EXTRA_ARM_FLAGS
 --extra-ldflags="-Wl,--fix-cortex-a8"
 endef
 
-ffmpeg/android-libs/armeabi-v7a: ANDROID_ABI=armeabi-v7a
-ffmpeg/android-libs/armeabi-v7a: ARCH=arm
-ffmpeg/android-libs/armeabi-v7a: CPU=armv7-a
-ffmpeg/android-libs/armeabi-v7a: PREFIX=arm-linux-androideabi
-ffmpeg/android-libs/armeabi-v7a: CC_PREFIX=armv7a-linux-androideabi
-ffmpeg/android-libs/armeabi-v7a: EXTRA_FLAGS=$(EXTRA_ARM_FLAGS)
+$(ANDROID_LIBS)/armeabi-v7a: ANDROID_ABI=armeabi-v7a
+$(ANDROID_LIBS)/armeabi-v7a: ARCH=arm
+$(ANDROID_LIBS)/armeabi-v7a: CPU=armv7-a
+$(ANDROID_LIBS)/armeabi-v7a: PREFIX=arm-linux-androideabi
+$(ANDROID_LIBS)/armeabi-v7a: CC_PREFIX=armv7a-linux-androideabi
+$(ANDROID_LIBS)/armeabi-v7a: EXTRA_FLAGS=$(EXTRA_ARM_FLAGS)
 
-ffmpeg/android-libs/arm64-v8a: ANDROID_ABI=arm64-v8a
-ffmpeg/android-libs/arm64-v8a: ARCH=aarch64
-ffmpeg/android-libs/arm64-v8a: CPU=armv8-a
-ffmpeg/android-libs/arm64-v8a: PREFIX=aarch64-linux-android
+$(ANDROID_LIBS)/arm64-v8a: ANDROID_ABI=arm64-v8a
+$(ANDROID_LIBS)/arm64-v8a: ARCH=aarch64
+$(ANDROID_LIBS)/arm64-v8a: CPU=armv8-a
+$(ANDROID_LIBS)/arm64-v8a: PREFIX=aarch64-linux-android
 
-ffmpeg/android-libs/x86: ANDROID_ABI=x86
-ffmpeg/android-libs/x86: ARCH=x86
-ffmpeg/android-libs/x86: CPU=i686
-ffmpeg/android-libs/x86: PREFIX=i686-linux-android
-ffmpeg/android-libs/x86: EXTRA_FLAGS=--disable-asm
+$(ANDROID_LIBS)/x86: ANDROID_ABI=x86
+$(ANDROID_LIBS)/x86: ARCH=x86
+$(ANDROID_LIBS)/x86: CPU=i686
+$(ANDROID_LIBS)/x86: PREFIX=i686-linux-android
+$(ANDROID_LIBS)/x86: EXTRA_FLAGS=--disable-asm
 
-ffmpeg/android-libs/x86_64: ANDROID_ABI=x86_64
-ffmpeg/android-libs/x86_64: ARCH=x86_64
-ffmpeg/android-libs/x86_64: CPU=x86_64
-ffmpeg/android-libs/x86_64: PREFIX=x86_64-linux-android
-ffmpeg/android-libs/x86_64: EXTRA_FLAGS=--disable-asm
+$(ANDROID_LIBS)/x86_64: ANDROID_ABI=x86_64
+$(ANDROID_LIBS)/x86_64: ARCH=x86_64
+$(ANDROID_LIBS)/x86_64: CPU=x86_64
+$(ANDROID_LIBS)/x86_64: PREFIX=x86_64-linux-android
+$(ANDROID_LIBS)/x86_64: EXTRA_FLAGS=--disable-asm
 
-ffmpeg/android-libs/armeabi-v7a ffmpeg/android-libs/arm64-v8a ffmpeg/android-libs/x86 ffmpeg/android-libs/x86_64:
-	@./ffmpeg.sh
-
-ffmpeg/android-libs/armeabi-v7a/lib ffmpeg/android-libs/arm64-v8a/lib ffmpeg/android-libs/x86/lib ffmpeg/android-libs/x86_64/lib:
+$(ANDROID_LIBS)/armeabi-v7a $(ANDROID_LIBS)/arm64-v8a $(ANDROID_LIBS)/x86 $(ANDROID_LIBS)/x86_64:
+	@./ffmpeg.sh && \
 	$(MAKE) -C ffmpeg -j4
 	$(MAKE) -C ffmpeg install
 
@@ -73,10 +73,10 @@ clean:
 	@$(MAKE) -s -C ffmpeg clean
 
 dist-clean:
-	@rm -rf ffmpeg/android-libs
+	@rm -rf $(ANDROID_LIBS)
 
 .SECONDEXPANSION:
-armeabi-v7a arm64-v8a x86 x86_64: ffmpeg/android-libs/$$@ ffmpeg/android-libs/$$@/lib
+armeabi-v7a arm64-v8a x86 x86_64: $(ANDROID_LIBS)/$$@
 
 .EXPORT_ALL_VARIABLES:
 .PHONY: armeabi-v7a arm64-v8a x86 x86_64 clean dist-clean
