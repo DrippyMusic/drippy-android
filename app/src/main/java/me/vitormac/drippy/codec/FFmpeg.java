@@ -40,12 +40,13 @@ public final class FFmpeg {
                 try (BufferedInputStream stream = IOUtils.buffer(FFmpeg.this.stream)) {
                     for (int i; (i = stream.read(data)) != -1; )
                         stdin.write(data, 0, i);
+                    stdin.close();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                FFmpeg.this.process.destroy();
             }
         }
 
     }
-    
+
 }
