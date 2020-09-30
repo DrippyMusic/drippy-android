@@ -12,11 +12,6 @@ public class SoundCloud extends ProviderBase<DataModel> {
     }
 
     @Override
-    protected String getMimeType() {
-        return "audio/mpeg";
-    }
-
-    @Override
     protected DataModel map(JsonObject object) {
         DataModel data = new DataModel();
         data.setUri(object.get("uri").getAsString());

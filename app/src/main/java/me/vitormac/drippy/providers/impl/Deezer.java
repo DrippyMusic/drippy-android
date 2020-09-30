@@ -4,8 +4,7 @@ import com.google.gson.JsonObject;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
+import java.net.URLConnection;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -18,7 +17,6 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import me.vitormac.drippy.providers.CacheableInputStream;
 import me.vitormac.drippy.providers.ProviderBase;
 import me.vitormac.drippy.providers.model.DeezerData;
 
@@ -29,14 +27,8 @@ public class Deezer extends ProviderBase<DeezerData> {
     }
 
     @Override
-    protected InputStream getInputStream(HttpURLConnection connection) throws IOException {
-        return new DecryptStream(connection.getInputStream(),
-                this.getOutputStream(), this.data.getKey());
-    }
-
-    @Override
-    protected String getMimeType() {
-        return "audio/mpeg";
+    protected InputStream getInputStream(URLConnection connection) throws IOException {
+        return new DecryptStream(connection.getInputStream(), this.data.getKey());
     }
 
     @Override
@@ -48,23 +40,24 @@ public class Deezer extends ProviderBase<DeezerData> {
         return data;
     }
 
-    private static class DecryptStream extends CacheableInputStream {
+    private static class DecryptStream extends InputStream {
 
         private int c = 0;
+        private byte[] data = new byte[8192];
 
+        private final InputStream stream;
         private final SecretKeySpec key;
         private final IvParameterSpec spec = new IvParameterSpec(new byte[]{
                 0, 1, 2, 3, 4, 5, 6, 7
         });
 
-        DecryptStream(InputStream stream, OutputStream output, SecretKeySpec key) {
-            super(stream, output);
+        DecryptStream(InputStream stream, SecretKeySpec key) {
+            this.stream = stream;
             this.key = key;
         }
 
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
-            byte[] data = new byte[4096];
             int i = 0;
 
             do {
@@ -85,7 +78,6 @@ public class Deezer extends ProviderBase<DeezerData> {
 
                 if (this.c % 3 > 0 || i < 2048) {
                     System.arraycopy(chunk, 0, b, pos, chunk.length);
-                    this.output.write(chunk);
                     if (i < 2048) {
                         return i;
                     }
@@ -98,7 +90,6 @@ public class Deezer extends ProviderBase<DeezerData> {
 
                     byte[] buffer = cipher.doFinal(chunk);
                     System.arraycopy(buffer, 0, b, pos, buffer.length);
-                    this.output.write(buffer);
                 } catch (NoSuchAlgorithmException
                         | NoSuchPaddingException
                         | InvalidAlgorithmParameterException
@@ -110,6 +101,17 @@ public class Deezer extends ProviderBase<DeezerData> {
             }
 
             return data.length;
+        }
+
+        @Override
+        public int read() {
+            return -1;
+        }
+
+        @Override
+        public void close() throws IOException {
+            this.stream.close();
+            super.close();
         }
 
     }
