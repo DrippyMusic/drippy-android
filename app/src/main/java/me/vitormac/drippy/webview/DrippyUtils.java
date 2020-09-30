@@ -7,7 +7,6 @@ import com.google.gson.JsonObject;
 import java.util.List;
 
 import me.vitormac.drippy.providers.ProviderBase;
-import me.vitormac.drippy.providers.impl.CacheProvider;
 import me.vitormac.drippy.providers.impl.Deezer;
 import me.vitormac.drippy.providers.impl.SoundCloud;
 
@@ -21,10 +20,6 @@ class DrippyUtils {
     }
 
     protected static ProviderBase<?> getProvider(JsonObject object, String id) {
-        if (object == null) {
-            return new CacheProvider(id);
-        }
-
         switch (object.get("id").getAsInt()) {
             case 0:
                 return new SoundCloud(object, id);
