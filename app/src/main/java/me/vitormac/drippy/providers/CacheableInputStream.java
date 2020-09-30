@@ -1,7 +1,11 @@
 package me.vitormac.drippy.providers;
 
-import java.io.BufferedInputStream;
+import org.apache.commons.io.IOUtils;
+
 import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,9 +15,9 @@ public class CacheableInputStream extends InputStream {
     protected final InputStream stream;
     protected final OutputStream output;
 
-    public CacheableInputStream(InputStream stream, OutputStream output) {
-        this.stream = new BufferedInputStream(stream);
-        this.output = new BufferedOutputStream(output);
+    public CacheableInputStream(InputStream stream, File file) throws FileNotFoundException {
+        this.stream = stream;
+        this.output = new BufferedOutputStream(new FileOutputStream(file));
     }
 
     @Override
@@ -44,6 +48,7 @@ public class CacheableInputStream extends InputStream {
 
     @Override
     public final void close() throws IOException {
+        IOUtils.copy(this.stream, this.output);
         this.stream.close();
         this.output.close();
         super.close();
