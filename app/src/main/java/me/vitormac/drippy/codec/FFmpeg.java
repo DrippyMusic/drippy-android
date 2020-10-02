@@ -13,14 +13,17 @@ public final class FFmpeg {
     private final Process process;
     private final InputStream stream;
 
-    public FFmpeg(InputStream stream) throws IOException {
+    public FFmpeg(InputStream stream, AudioFormat format) throws IOException {
+        this(stream, format, Bitrate.B96K);
+    }
+
+    public FFmpeg(InputStream stream, AudioFormat format, Bitrate bitrate) throws IOException {
         this.stream = stream;
         String path = Objects.requireNonNull(System.getProperty("native.dir"));
 
-        this.process = new ProcessBuilder(path + "/ffmpeg",
-                "-loglevel", "quiet",
-                "-f", "mp3", "-i", "pipe:0",
-                "-c:a", "libopus", "-b:a", "64K",
+        this.process = new ProcessBuilder(path + "/ffmpeg", "-loglevel", "quiet",
+                "-f", format.getName(), "-i", "pipe:0",
+                "-c:a", "libopus", "-b:a", bitrate.getName(),
                 "-f", "opus", "pipe:1").start();
         new Thread(new PipeWriter()).start();
     }

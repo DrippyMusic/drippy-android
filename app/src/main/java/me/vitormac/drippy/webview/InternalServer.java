@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import fi.iki.elonen.NanoHTTPD;
+import me.vitormac.drippy.codec.AudioFormat;
 import me.vitormac.drippy.codec.FFmpeg;
 import me.vitormac.drippy.providers.CacheableInputStream;
 import me.vitormac.drippy.providers.ProviderBase;
@@ -56,7 +57,7 @@ public final class InternalServer extends NanoHTTPD {
                         .getAsJsonObject();
 
                 ProviderBase<?> provider = DrippyUtils.getProvider(data, id);
-                FFmpeg ffmpeg = new FFmpeg(provider.stream());
+                FFmpeg ffmpeg = new FFmpeg(provider.stream(), AudioFormat.MP3);
 
                 return NanoHTTPD.newChunkedResponse(Response.Status.OK, "audio/opus",
                         new CacheableInputStream(ffmpeg.stdout(), file));
