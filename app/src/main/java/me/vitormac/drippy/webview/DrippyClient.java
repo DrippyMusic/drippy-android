@@ -36,7 +36,7 @@ public final class DrippyClient extends WebViewClient {
 
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-        if (StringUtils.equals(request.getUrl().getHost(), "api.drippy.live")
+        if (StringUtils.equals(request.getUrl().getHost(), InternalServer.API_HOST)
                 && StringUtils.equalsAny(request.getMethod(), "GET", "OPTIONS")) {
             try {
                 return this.drippy.request(this.isConnected(), request);

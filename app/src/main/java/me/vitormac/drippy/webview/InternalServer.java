@@ -19,14 +19,15 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.ResponseBody;
 
-public final class InternalServer extends NanoHTTPD {
+final class InternalServer extends NanoHTTPD {
 
-    public static final int PORT = 5627;
-    private static final String API_URL = "https://api.drippy.live";
+    protected static final int PORT = 5627;
+    protected static final String API_HOST = "api.drippy.live";
+    protected static final String API_URL = "https://" + API_HOST + '/';
 
     private final OkHttpClient client = new OkHttpClient();
 
-    public InternalServer() {
+    protected InternalServer() {
         super("127.0.0.1", InternalServer.PORT);
     }
 
@@ -50,7 +51,7 @@ public final class InternalServer extends NanoHTTPD {
                         new FileInputStream(file), file.length());
             }
 
-            Request.Builder request = new Request.Builder().url(API_URL + "/data/" + id);
+            Request.Builder request = new Request.Builder().url(API_URL + "data/" + id);
             try (okhttp3.Response response = this.client.newCall(request.build()).execute()) {
                 ResponseBody body = Objects.requireNonNull(response.body());
                 JsonObject data = JsonParser.parseString(body.string())

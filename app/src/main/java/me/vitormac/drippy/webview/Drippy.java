@@ -39,6 +39,12 @@ final class Drippy {
     }
 
     private Drippy() {
+        try {
+            new InternalServer().start();
+        } catch (IOException e) {
+            System.err.println("Internal server couldn't be loaded: " + e.getMessage());
+            System.exit(0);
+        }
     }
 
     protected WebResourceResponse request(boolean connected, WebResourceRequest request)
