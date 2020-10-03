@@ -44,7 +44,7 @@ public final class InternalServer extends NanoHTTPD {
         if (parameters.containsKey("id")) {
             String id = parameters.get("id").get(0);
 
-            File file = ProviderBase.getCache(id);
+            File file = DrippyUtils.getCache(id);
             if (file.exists()) {
                 return NanoHTTPD.newFixedLengthResponse(Response.Status.OK, "audio/opus",
                         new FileInputStream(file), file.length());
